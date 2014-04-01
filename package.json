@@ -1,0 +1,14 @@
+{
+  "name": "inbound-cloud",
+  "version": "0.0.0",
+  "description": "Inbound push messageboard.",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "eventsource": ">=0.1.0",
+    "debug": "~0.8.0"
+  },
+  "author": "David Wood",
+  "private": true
+}

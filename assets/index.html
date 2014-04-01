@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Esendex Inbound Cloud</title>
+
+    <link rel="stylesheet" type="text/css" href="/index.css" />
+
+    <script src="/jquery.min.js"></script>
+    <script src="/d3.v3.min.js"></script>
+    <script src="/d3.layout.cloud.js"></script>
+
+    <script type="text/javascript">
+    $(function () {
+
+        var messages = [];
+
+        function updateMessages() {
+            var lastMessageTimestamp = messages.length > 0 ? messages[messages.length-1].timestamp : 0;
+            $.get("/messages?from=" + lastMessageTimestamp, function (data) {
+                messages = messages.concat(data.messages);
+
+                for (var i = 0; i < data.messages.length; i++) {
+                    var message = data.messages[i];
+
+                    var span = $('<span>').text(message.message);
+                    span.appendTo($('<li>').prependTo('#messages'));
+                };
+            });
+        }
+
+        function queueUpdate() {
+            window.setTimeout(function () {
+                updateMessages();
+                queueUpdate();
+            }, 5000);
+        }
+
+        updateMessages();
+        queueUpdate();
+    });
+    </script>
+</head>
+<body>
+    <div id="banner">Text "KEYWORD" followed by your message to 12345!</div>
+    <ul id="messages"></ul>
+</body>
+</html>
