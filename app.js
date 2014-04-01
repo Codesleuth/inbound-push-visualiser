@@ -9,28 +9,15 @@ var config = require('./config.json'),
 
 
 var sampleMessages = (function () {
-    var now = Date.now();
-    return [{
-        "timestamp": now - 5,
-        "message": "Nice office!!"
-    },{
-        "timestamp": now - 4,
-        "message": "Fancy a game of pool?"
-    },{
-        "timestamp": now - 3,
-        "message": "Brilliant party!"
-    },{
-        "timestamp": now - 2,
-        "message": "Ohhh nice roof terrace!"
-    },{
-        "timestamp": now - 1,
-        "message": "Good luck Esendex!"
-    }];
+    var samples = ["Nice office!!", "Fancy a game of pool?", "Brilliant party!", "Ohhh nice roof terrace!", "Good luck Esendex!"];
+    return samples.map(function (sample) {
+        return { "timestamp": 1, "message": sample };
+    });
 })();
 
 
-var messageLog = sampleMessages.concat(sampleMessages).concat(sampleMessages);
-
+var messageLog = sampleMessages.concat(sampleMessages).concat(sampleMessages).concat(sampleMessages);
+var messageLogLimit = 10;
 
 var listener = new PushListener(config.accountid);
 listener.debug = debug('app:listener');
@@ -48,13 +35,13 @@ listener.on('message', function (msg) {
 
         this.debug('Received message: %s', message);
 
-        if (messageLog.length > 100)
-            messageLog.splice(100);
-
         messageLog.push({
             "timestamp": Date.now(),
             "message": message
         });
+
+        if (messageLog.length > messageLogLimit)
+            messageLog.splice(0, messageLog.length - messageLogLimit);
     }
 });
 
