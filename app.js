@@ -5,7 +5,8 @@ var config = require('./config.json'),
     fs = require('fs'),
     http = require('http'),
     debug = require('debug'),
-    path = require('path');
+    path = require('path'),
+    request = require('request');
 
 
 
@@ -27,6 +28,21 @@ listener.on('message', function (msg) {
 
     if (msg.type != "inbound")
         return;
+
+    if (typeof config.forwardto === "string") {
+        listener.debug('forwarding message to: %s', config.forwardto);
+        var req = request({
+            url: config.forwardto,
+            body: msg.body,
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/xml"
+            }
+        }, function (err, res, body) {
+          if (err || res && (res.statusCode < 200 || res.statusCode >= 300))
+            listener.debug('forwarding error: %s', err || res.statusCode);
+        });
+    }
 
     var prefix = config.prefix || '';
     var messageText = msg.message.InboundMessage.MessageText[0];
@@ -86,7 +102,7 @@ var contentTypes = {
 
 var server = http.createServer(function (req, res) {
 
-    this.debug('%s %s', req.method, req.url);
+    this.debug('%s %s %s', req.headers['x-forwarded-for'] || req.connection.remoteAddress, req.method, req.url);
 
     if (req.method == 'GET') {
         if (req.url == '/messages' || req.url.indexOf('/messages?') == 0) {
