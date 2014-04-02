@@ -4,7 +4,8 @@ var config = require('./config.json'),
     PushListener = require('./lib/pushlistener'),
     fs = require('fs'),
     http = require('http'),
-    debug = require('debug');
+    debug = require('debug'),
+    path = require('path');
 
 
 
@@ -73,6 +74,15 @@ function reply404(res) {
     res.end('Not found');
 }
 
+var contentTypes = {
+  ".html": "text/html",
+  ".css": "text/css",
+  ".js": "application/javascript",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg"
+}
+
 
 var server = http.createServer(function (req, res) {
 
@@ -105,46 +115,22 @@ var server = http.createServer(function (req, res) {
             return;
         }
 
-        if (req.url == '/index.css') {
-            var filename = __dirname + "/assets/index.css";
-            fs.exists(filename, function (exists) {
-                if (exists) {
-                    res.writeHead(200, {'Content-Type': 'text/css'});
-                    fs.createReadStream(filename).pipe(res);
-                } else {
-                    reply404(res);
-                }
-            });
-            
-            return;
-        }
 
-        if (req.url == '/jquery.min.js') {
-            var filename = __dirname + "/assets/jquery.min.js";
-            fs.exists(filename, function (exists) {
-                if (exists) {
-                    res.writeHead(200, {'Content-Type': 'application/javascript'});
-                    fs.createReadStream(filename).pipe(res);
-                } else {
-                    reply404(res);
-                }
-            });
-            
-            return;
-        }
+        var filename = __dirname + (req.url == "/" ? "/assets/index.html" : "/assets" + req.url);
+        this.debug('looking for: ', filename);
 
-        if (req.url == '/') {
-            var filename = __dirname + "/assets/index.html";
-            fs.exists(filename, function (exists) {
-                if (exists) {
-                    res.writeHead(200, {'Content-Type': 'text/html'});
-                    fs.createReadStream(filename).pipe(res);
-                } else {
-                    reply404(res);
-                }
-            });
-            return;
-        }
+        fs.exists(filename, function (exists) {
+            if (exists) {
+                var extension = path.extname(filename);
+                var contentType = contentTypes[extension];
+                res.writeHead(200, {'Content-Type': contentType});
+                fs.createReadStream(filename).pipe(res);
+            } else {
+                reply404(res);
+            }
+        });
+
+        return;
     }
 
     reply404(res);
