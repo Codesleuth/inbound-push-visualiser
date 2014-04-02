@@ -3,9 +3,9 @@
 <head>
     <title>Esendex Inbound Cloud</title>
 
-    <link rel="stylesheet" type="text/css" href="/index.css" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
 
-    <script src="/jquery.min.js"></script>
+    <script src="jquery.min.js"></script>
 
     <script type="text/javascript">
     $(function () {
@@ -21,8 +21,6 @@
         function updateMessages() {
             var lastMessageTimestamp = messages.length > 0 ? messages[messages.length-1].timestamp : 0;
             $.get("/messages?from=" + lastMessageTimestamp, function (data) {
-                //messages = messages.concat(data.messages);
-
                 for (var i = 0; i < data.messages.length; i++) {
                     var message = data.messages[i];
                     addMessage(message);
@@ -41,18 +39,24 @@
         queueUpdate();
 
         $(document).keydown(function (evt) {
-            if (evt.which == 13) {
+            if (evt.which == 77) {
                 evt.preventDefault();
 
                 var d = new Date().getTime();
-                addMessage({ "timestamp": d, "message": "Added message " + d });
+                addMessage({ "timestamp": d, "message": "Added message dsfsdfssdfffffsdlkfjsldkfjlksdfkjsdfjskldjflksjfkjfsdlkj " + d });
             }
         })
     });
     </script>
 </head>
 <body>
-    <div id="banner">Text "KEYWORD" followed by your message to 12345!</div>
-    <ul id="messages"></ul>
+
+	<div id="col">
+		<div id="logo"><img src="logo.png" alt="" /></div>
+    	<div id="banner">Text "OFFICE" followed by your message to 80800!</div>
+	</div>
+
+	<ul id="messages"></ul>
+
 </body>
 </html>
